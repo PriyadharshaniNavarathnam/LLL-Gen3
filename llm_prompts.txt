@@ -1,0 +1,530 @@
+Patient ID: 01
+Age: 88
+Gender: M
+Health metrics:
+- SpO2: 96.93
+- HR: 91.32
+- RESP: 21.44
+- PULSE: 91.01
+Provide a medical interpretation.
+
+Patient ID: 02
+Age: 65
+Gender: M
+Health metrics:
+- SpO2: 99.99
+- HR: 91.07
+- RESP: 15.35
+- PULSE: 90.66
+Provide a medical interpretation.
+
+Patient ID: 03
+Age: 46
+Gender: F
+Health metrics:
+- SpO2: 95.75
+- HR: 76.64
+- RESP: 17.64
+- PULSE: 75.89
+Provide a medical interpretation.
+
+Patient ID: 04
+Age: 78
+Gender: M
+Health metrics:
+- SpO2: 93.0
+- HR: 92.4
+- RESP: 16.66
+- PULSE: 92.48
+Provide a medical interpretation.
+
+Patient ID: 05
+Age: 73
+Gender: F
+Health metrics:
+- SpO2: 99.34
+- HR: 98.21
+- RESP: 11.45
+- PULSE: 97.85
+Provide a medical interpretation.
+
+Patient ID: 06
+Age: 64
+Gender: F
+Health metrics:
+- SpO2: 99.0
+- HR: 81.84
+- RESP: 19.9
+- PULSE: 81.26
+Provide a medical interpretation.
+
+Patient ID: 07
+Age: 64
+Gender: F
+Health metrics:
+- SpO2: 95.0
+- HR: 90.1
+- RESP: 19.91
+- PULSE: 89.79
+Provide a medical interpretation.
+
+Patient ID: 08
+Age: 64
+Gender: F
+Health metrics:
+- SpO2: 93.0
+- HR: 99.95
+- RESP: 21.1
+- PULSE: 99.77
+Provide a medical interpretation.
+
+Patient ID: 09
+Age: 64
+Gender: F
+Health metrics:
+- SpO2: 93.0
+- HR: 76.74
+- RESP: 20.0
+- PULSE: 76.56
+Provide a medical interpretation.
+
+Patient ID: 10
+Age: 74
+Gender: M
+Health metrics:
+- SpO2: 97.95
+- HR: 82.15
+- RESP: 18.41
+- PULSE: 81.51
+Provide a medical interpretation.
+
+Patient ID: 11
+Age: 50
+Gender: M
+Health metrics:
+- SpO2: 98.01
+- HR: 92.98
+- RESP: 15.4
+- PULSE: 92.75
+Provide a medical interpretation.
+
+Patient ID: 12
+Age: 75
+Gender: M
+Health metrics:
+- SpO2: 95.96
+- HR: 93.02
+- RESP: 18.98
+- PULSE: 92.69
+Provide a medical interpretation.
+
+Patient ID: 13
+Age: 71
+Gender: F
+Health metrics:
+- SpO2: 99.97
+- HR: 66.82
+- RESP: 3.2
+- PULSE: 66.06
+Provide a medical interpretation.
+
+Patient ID: 14
+Age: 70
+Gender: F
+Health metrics:
+- SpO2: 98.65
+- HR: 95.15
+- RESP: 19.46
+- PULSE: 94.93
+Provide a medical interpretation.
+
+Patient ID: 15
+Age: 51
+Gender: M
+Health metrics:
+- SpO2: 98.18
+- HR: 107.36
+- RESP: 14.49
+- PULSE: 107.27
+Provide a medical interpretation.
+
+Patient ID: 16
+Age: 56
+Gender: M
+Health metrics:
+- SpO2: 98.57
+- HR: 109.52
+- RESP: 19.45
+- PULSE: 109.54
+Provide a medical interpretation.
+
+Patient ID: 17
+Age: 72
+Gender: F
+Health metrics:
+- SpO2: 93.29
+- HR: 81.05
+- RESP: 16.97
+- PULSE: 77.05
+Provide a medical interpretation.
+
+Patient ID: 18
+Age: Unknown
+Gender: Unknown
+Health metrics:
+- SpO2: 97.94
+- HR: 90.09
+- RESP: 17.89
+- PULSE: 89.64
+Provide a medical interpretation.
+
+Patient ID: 19
+Age: 85
+Gender: F
+Health metrics:
+- SpO2: 100.0
+- HR: 73.49
+- RESP: 12.77
+- PULSE: 72.88
+Provide a medical interpretation.
+
+Patient ID: 20
+Age: 44
+Gender: F
+Health metrics:
+- SpO2: 99.82
+- HR: 87.99
+- RESP: 15.15
+- PULSE: 87.48
+Provide a medical interpretation.
+
+Patient ID: 21
+Age: 44
+Gender: F
+Health metrics:
+- SpO2: 100.0
+- HR: 123.99
+- RESP: 17.71
+- PULSE: 123.51
+Provide a medical interpretation.
+
+Patient ID: 22
+Age: 44
+Gender: F
+Health metrics:
+- SpO2: 92.32
+- HR: 81.64
+- RESP: 18.75
+- PULSE: 81.2
+Provide a medical interpretation.
+
+Patient ID: 23
+Age: 44
+Gender: F
+Health metrics:
+- SpO2: 97.94
+- HR: 63.97
+- RESP: 18.14
+- PULSE: 62.5
+Provide a medical interpretation.
+
+Patient ID: 24
+Age: 77
+Gender: M
+Health metrics:
+- SpO2: 98.17
+- HR: 96.46
+- RESP: 22.57
+- PULSE: 94.48
+Provide a medical interpretation.
+
+Patient ID: 25
+Age: 74
+Gender: F
+Health metrics:
+- SpO2: 97.58
+- HR: 124.25
+- RESP: 16.2
+- PULSE: 124.75
+Provide a medical interpretation.
+
+Patient ID: 26
+Age: 86
+Gender: M
+Health metrics:
+- SpO2: 95.4
+- HR: 90.14
+- RESP: 16.52
+- PULSE: 88.39
+Provide a medical interpretation.
+
+Patient ID: 27
+Age: 43
+Gender: M
+Health metrics:
+- SpO2: 96.0
+- HR: 88.25
+- RESP: 10.47
+- PULSE: 87.95
+Provide a medical interpretation.
+
+Patient ID: 28
+Age: Unknown
+Gender: Unknown
+Health metrics:
+- SpO2: 99.91
+- HR: 82.98
+- RESP: 18.16
+- PULSE: 80.64
+Provide a medical interpretation.
+
+Patient ID: 29
+Age: 77
+Gender: M
+Health metrics:
+- SpO2: 92.83
+- HR: 90.54
+- RESP: 18.53
+- PULSE: 90.15
+Provide a medical interpretation.
+
+Patient ID: 30
+Age: 48
+Gender: F
+Health metrics:
+- SpO2: 95.7
+- HR: 88.43
+- RESP: 18.7
+- PULSE: 88.11
+Provide a medical interpretation.
+
+Patient ID: 31
+Age: 69
+Gender: F
+Health metrics:
+- SpO2: 100.0
+- HR: 83.58
+- RESP: 18.1
+- PULSE: 83.1
+Provide a medical interpretation.
+
+Patient ID: 32
+Age: Unknown
+Gender: Unknown
+Health metrics:
+- SpO2: 84.67
+- HR: 81.06
+- RESP: 24.67
+- PULSE: 80.33
+Provide a medical interpretation.
+
+Patient ID: 33
+Age: 76
+Gender: F
+Health metrics:
+- SpO2: 93.62
+- HR: 82.37
+- RESP: 20.09
+- PULSE: 82.93
+Provide a medical interpretation.
+
+Patient ID: 34
+Age: 57
+Gender: M
+Health metrics:
+- SpO2: 100.0
+- HR: 81.8
+- RESP: 17.76
+- PULSE: 81.12
+Provide a medical interpretation.
+
+Patient ID: 35
+Age: 67
+Gender: F
+Health metrics:
+- SpO2: 96.67
+- HR: 101.94
+- RESP: 17.09
+- PULSE: 101.51
+Provide a medical interpretation.
+
+Patient ID: 36
+Age: 57
+Gender: F
+Health metrics:
+- SpO2: 98.11
+- HR: 72.95
+- RESP: 18.48
+- PULSE: 72.56
+Provide a medical interpretation.
+
+Patient ID: 37
+Age: 70
+Gender: F
+Health metrics:
+- SpO2: 99.52
+- HR: 90.09
+- RESP: 18.69
+- PULSE: 89.41
+Provide a medical interpretation.
+
+Patient ID: 38
+Age: 88
+Gender: F
+Health metrics:
+- SpO2: 94.77
+- HR: 83.83
+- RESP: 16.07
+- PULSE: 82.88
+Provide a medical interpretation.
+
+Patient ID: 39
+Age: 88
+Gender: F
+Health metrics:
+- SpO2: 97.2
+- HR: 75.52
+- RESP: 14.3
+- PULSE: 70.21
+Provide a medical interpretation.
+
+Patient ID: 40
+Age: 26
+Gender: F
+Health metrics:
+- SpO2: 96.88
+- HR: 110.44
+- RESP: 16.73
+- PULSE: 109.95
+Provide a medical interpretation.
+
+Patient ID: 41
+Age: 73
+Gender: F
+Health metrics:
+- SpO2: 100.0
+- HR: 79.19
+- RESP: 13.83
+- PULSE: 72.69
+Provide a medical interpretation.
+
+Patient ID: 42
+Age: 85
+Gender: F
+Health metrics:
+- SpO2: 95.01
+- HR: 83.72
+- RESP: 17.29
+- PULSE: 83.41
+Provide a medical interpretation.
+
+Patient ID: 43
+Age: 19
+Gender: F
+Health metrics:
+- SpO2: 96.8
+- HR: 89.92
+- RESP: 17.46
+- PULSE: 89.36
+Provide a medical interpretation.
+
+Patient ID: 44
+Age: Unknown
+Gender: Unknown
+Health metrics:
+- SpO2: 97.3
+- HR: 89.83
+- RESP: 16.67
+- PULSE: 89.48
+Provide a medical interpretation.
+
+Patient ID: 45
+Age: 52
+Gender: M
+Health metrics:
+- SpO2: 100.0
+- HR: 61.26
+- RESP: 16.04
+- PULSE: 62.54
+Provide a medical interpretation.
+
+Patient ID: 46
+Age: 61
+Gender: F
+Health metrics:
+- SpO2: 95.61
+- HR: 106.7
+- RESP: 18.52
+- PULSE: 106.62
+Provide a medical interpretation.
+
+Patient ID: 47
+Age: 48
+Gender: M
+Health metrics:
+- SpO2: 97.73
+- HR: 83.66
+- RESP: 22.11
+- PULSE: 83.23
+Provide a medical interpretation.
+
+Patient ID: 48
+Age: 37
+Gender: M
+Health metrics:
+- SpO2: 98.48
+- HR: 101.42
+- RESP: 18.35
+- PULSE: 100.77
+Provide a medical interpretation.
+
+Patient ID: 49
+Age: 77
+Gender: M
+Health metrics:
+- SpO2: 85.89
+- HR: 84.51
+- RESP: 17.3
+- PULSE: 84.28
+Provide a medical interpretation.
+
+Patient ID: 50
+Age: 67
+Gender: M
+Health metrics:
+- SpO2: 98.52
+- HR: 76.32
+- RESP: 14.94
+- PULSE: 76.03
+Provide a medical interpretation.
+
+Patient ID: 51
+Age: 78
+Gender: F
+Health metrics:
+- SpO2: 98.31
+- HR: 90.04
+- RESP: 18.34
+- PULSE: 89.75
+Provide a medical interpretation.
+
+Patient ID: 52
+Age: 29
+Gender: F
+Health metrics:
+- SpO2: 92.75
+- HR: 115.1
+- RESP: 18.43
+- PULSE: 115.17
+Provide a medical interpretation.
+
+Patient ID: 53
+Age: 81
+Gender: M
+Health metrics:
+- SpO2: 100.0
+- HR: 92.82
+- RESP: 19.93
+- PULSE: 91.8
+Provide a medical interpretation.
+

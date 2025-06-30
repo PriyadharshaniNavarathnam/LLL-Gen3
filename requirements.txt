@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+langchain
+pypdf
+pinecone-client
+sentence-transformers
+langchain-pinecone
+langchain-groq
+python-dotenv
