@@ -26,6 +26,10 @@ class VitalsInput(BaseModel):
     mobility: int
     ecg_anomaly: bool
 
+# Input model for question chat
+class QuestionInput(BaseModel):
+    question: str
+
 # Initialize retriever and LLM once
 retriever = PineconeVectorStore.from_existing_index(
     index_name="mhmb",
@@ -40,6 +44,7 @@ qa_chain = RetrievalQA.from_chain_type(
     return_source_documents=True
 )
 
+# Endpoint for vitals-based anomaly detection and alerting
 @app.post("/analyze")
 async def analyze_vitals(vitals: VitalsInput, response: Response):
     data = vitals.dict()
@@ -49,9 +54,17 @@ async def analyze_vitals(vitals: VitalsInput, response: Response):
         response.status_code = status.HTTP_204_NO_CONTENT
         return
 
-    qa_chain = get_chain()
     alert_message = generate_combined_alert(anomalies, qa_chain)
     return {
         "status": "alert",
         "message": alert_message
+    }
+
+# Endpoint for general medical question-answering
+@app.post("/ask")
+async def ask_medical_question(input: QuestionInput):
+    response = qa_chain.run(input.question)
+    return {
+        "question": input.question,
+        "answer": response
     }
