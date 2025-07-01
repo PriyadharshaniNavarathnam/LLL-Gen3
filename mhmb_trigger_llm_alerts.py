@@ -46,7 +46,7 @@ def check_anomalies(data):
                 anomalies[key] = value
     return anomalies
 
-def generate_combined_alert(anomalies):
+def generate_combined_alert(anomalies, qa_chain):
     description_list = [
         "abnormal ECG" if k == "ecg_anomaly" else f"{k.replace('_', ' ')} = {v}"
         for k, v in anomalies.items()
@@ -84,5 +84,5 @@ if __name__ == "__main__":
     anomalies = check_anomalies(patient_data)
     
     if anomalies:
-        alert_message = generate_combined_alert(anomalies)
+        alert_message = generate_combined_alert(anomalies, qa_chain)
         trigger_alert(alert_message)

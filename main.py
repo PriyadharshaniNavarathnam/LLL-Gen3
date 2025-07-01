@@ -43,6 +43,10 @@ qa_chain = RetrievalQA.from_chain_type(
     retriever=retriever,
     return_source_documents=True
 )
+# Root health check
+@app.get("/")
+def root():
+    return {"status": "running"}
 
 # Endpoint for vitals-based anomaly detection and alerting
 @app.post("/analyze")
@@ -63,8 +67,9 @@ async def analyze_vitals(vitals: VitalsInput, response: Response):
 # Endpoint for general medical question-answering
 @app.post("/ask")
 async def ask_medical_question(input: QuestionInput):
-    response = qa_chain.run(input.question)
+    response = qa_chain.invoke({"query": input.question})
+    answer = response["result"]
     return {
         "question": input.question,
-        "answer": response
+        "answer": answer
     }
