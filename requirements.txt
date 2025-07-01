@@ -7,3 +7,4 @@ sentence-transformers
 langchain-pinecone
 langchain-groq
 python-dotenv
+langchain-community

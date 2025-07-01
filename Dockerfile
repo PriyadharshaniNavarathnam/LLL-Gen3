@@ -11,8 +11,9 @@ COPY . /app
 RUN apt-get update && apt-get install -y build-essential && \
     pip install --upgrade pip && \
     pip install -r requirements.txt && \
-    apt-get remove -y build-essential && apt-get autoremove -y
-
+   apt-get purge -y --auto-remove build-essential && \
+    rm -rf /var/lib/apt/lists/*
+    
 # Expose the port your FastAPI app will run on
 EXPOSE 8000
 
