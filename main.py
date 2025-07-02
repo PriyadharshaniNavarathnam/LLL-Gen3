@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Response, status
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from preprocess_books import get_embeddings
@@ -15,6 +16,15 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 # Initialize FastAPI app
 app = FastAPI()
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Allow React local dev server
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Input model for vitals
 class VitalsInput(BaseModel):
