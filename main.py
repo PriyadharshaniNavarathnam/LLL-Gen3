@@ -4,6 +4,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from langchain.chains import RetrievalQA
+from langchain.prompts import PromptTemplate
 from langchain_pinecone import PineconeVectorStore
 from langchain_groq import ChatGroq
 from preprocess_books import get_embeddings
@@ -17,16 +18,16 @@ assert GROQ_API_KEY, "Missing GROQ_API_KEY in .env"
 # Create FastAPI app
 app = FastAPI()
 
-# ✅ CORS middleware
+# Allow CORS for frontend connection
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # You can restrict to ["https://your-frontend.com"]
+    allow_origins=["*"],  # Update in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Normal ranges for vitals
+# Define normal ranges
 NORMAL_RANGES = {
     "skin_temperature": (36.1, 37.2),
     "heart_rate": (60, 100),
@@ -36,18 +37,37 @@ NORMAL_RANGES = {
     "mobility": (1000, 20000),
 }
 
-# Load vector retriever and LLM
+# Load Pinecone retriever
 retriever = PineconeVectorStore.from_existing_index(
     index_name="mhmb",
     embedding=get_embeddings()
 ).as_retriever(search_type="similarity", search_kwargs={"k": 3})
 
-llm = ChatGroq(model_name="llama3-70b-8192")
+# LLM setup with custom prompt
+prompt_template = PromptTemplate(
+    input_variables=["context", "question"],
+    template="""
+You are a reliable and kind AI healthcare assistant. Use the context below and your medical knowledge to answer the user's question clearly.
+If the answer is not in the context, provide a helpful, confident explanation based on general knowledge.
+Never say you don't know.
 
+Context:
+{context}
+
+Question:
+{question}
+
+Answer:
+"""
+)
+
+llm = ChatGroq(model_name="llama3-70b-8192")
 qa_chain = RetrievalQA.from_chain_type(
     llm=llm,
     retriever=retriever,
-    return_source_documents=True
+    return_source_documents=True,
+    chain_type="stuff",
+    chain_type_kwargs={"prompt": prompt_template}
 )
 
 # Request models
@@ -63,7 +83,7 @@ class VitalsData(BaseModel):
 class ChatRequest(BaseModel):
     question: str
 
-# Anomaly checker
+# Check for out-of-range vitals
 def check_anomalies(data):
     anomalies = {}
     for key, value in data.items():
@@ -75,7 +95,7 @@ def check_anomalies(data):
                 anomalies[key] = value
     return anomalies
 
-# Simplify LLM response for patient
+# Simplify long LLM output for patient readability
 def simplify_explanation(text: str) -> str:
     lines = text.split('\n')
     simplified_lines = []
@@ -91,7 +111,7 @@ def simplify_explanation(text: str) -> str:
     simplified_lines.append("Please consult your doctor for proper care.")
     return " ".join(simplified_lines)
 
-# 🚨 Anomaly alert endpoint
+# Alert endpoint
 @app.post("/trigger-alert")
 async def trigger_alert(vitals: VitalsData):
     patient_data = vitals.dict()
@@ -114,11 +134,9 @@ async def trigger_alert(vitals: VitalsData):
     if not anomalies:
         return {"message": "All vitals are within normal range."}
 
-    description = [
-        "abnormal ECG" if k == "ecg_anomaly" else f"{k.replace('_', ' ')} = {v}"
-        for k, v in anomalies.items()
-    ]
-    alert_summary = "; ".join(description)
+    alert_summary = "; ".join(
+        ["abnormal ECG" if k == "ecg_anomaly" else f"{k.replace('_', ' ')} = {v}" for k, v in anomalies.items()]
+    )
 
     query = (
         f"The patient shows the following anomalies: {alert_summary}. "
@@ -126,7 +144,6 @@ async def trigger_alert(vitals: VitalsData):
     )
     response = qa_chain({"query": query})
     explanation = response["result"]
-
     simplified = simplify_explanation(explanation)
 
     return {
@@ -134,7 +151,7 @@ async def trigger_alert(vitals: VitalsData):
         "medical_explanation": simplified
     }
 
-# 💬 Chatbot endpoint
+# Chat endpoint
 @app.post("/ask")
 async def ask_question(req: ChatRequest):
     question = req.question.strip()
@@ -143,7 +160,7 @@ async def ask_question(req: ChatRequest):
     response = qa_chain({"query": question})
     return {"answer": response["result"]}
 
-# Run locally (optional)
+# Run locally
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
