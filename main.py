@@ -1,19 +1,30 @@
 import os
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from langchain.chains import RetrievalQA
 from langchain_pinecone import PineconeVectorStore
 from langchain_groq import ChatGroq
 from preprocess_books import get_embeddings
 
+# Load environment variables
 load_dotenv()
-
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 assert GROQ_API_KEY, "Missing GROQ_API_KEY in .env"
 
+# Create FastAPI app
 app = FastAPI()
+
+# ✅ CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # You can restrict to ["https://your-frontend.com"]
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Normal ranges for vitals
 NORMAL_RANGES = {
@@ -25,7 +36,7 @@ NORMAL_RANGES = {
     "mobility": (1000, 20000),
 }
 
-# Load retriever and LLM
+# Load vector retriever and LLM
 retriever = PineconeVectorStore.from_existing_index(
     index_name="mhmb",
     embedding=get_embeddings()
@@ -39,6 +50,7 @@ qa_chain = RetrievalQA.from_chain_type(
     return_source_documents=True
 )
 
+# Request models
 class VitalsData(BaseModel):
     skin_temperature: float
     heart_rate: int
@@ -51,6 +63,7 @@ class VitalsData(BaseModel):
 class ChatRequest(BaseModel):
     question: str
 
+# Anomaly checker
 def check_anomalies(data):
     anomalies = {}
     for key, value in data.items():
@@ -62,6 +75,7 @@ def check_anomalies(data):
                 anomalies[key] = value
     return anomalies
 
+# Simplify LLM response for patient
 def simplify_explanation(text: str) -> str:
     lines = text.split('\n')
     simplified_lines = []
@@ -77,11 +91,11 @@ def simplify_explanation(text: str) -> str:
     simplified_lines.append("Please consult your doctor for proper care.")
     return " ".join(simplified_lines)
 
+# 🚨 Anomaly alert endpoint
 @app.post("/trigger-alert")
 async def trigger_alert(vitals: VitalsData):
     patient_data = vitals.dict()
 
-    # Check if all vitals are zero or false (excluding ecg_anomaly bool)
     all_zero = all(
         (value == 0 or value is False)
         for key, value in patient_data.items()
@@ -97,7 +111,6 @@ async def trigger_alert(vitals: VitalsData):
         }
 
     anomalies = check_anomalies(patient_data)
-
     if not anomalies:
         return {"message": "All vitals are within normal range."}
 
@@ -121,6 +134,7 @@ async def trigger_alert(vitals: VitalsData):
         "medical_explanation": simplified
     }
 
+# 💬 Chatbot endpoint
 @app.post("/ask")
 async def ask_question(req: ChatRequest):
     question = req.question.strip()
@@ -129,6 +143,7 @@ async def ask_question(req: ChatRequest):
     response = qa_chain({"query": question})
     return {"answer": response["result"]}
 
+# Run locally (optional)
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
