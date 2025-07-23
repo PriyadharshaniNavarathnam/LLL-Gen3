@@ -1,46 +1,31 @@
-from fastapi import FastAPI, Response, status
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+import os
 from dotenv import load_dotenv
-from preprocess_books import get_embeddings
-from mhmb_trigger_llm_alerts import check_anomalies, generate_combined_alert
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 from langchain.chains import RetrievalQA
 from langchain_pinecone import PineconeVectorStore
 from langchain_groq import ChatGroq
-import os
+from preprocess_books import get_embeddings
 
-# Load environment variables
 load_dotenv()
+
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+assert GROQ_API_KEY, "Missing GROQ_API_KEY in .env"
 
-# Initialize FastAPI app
 app = FastAPI()
 
+# Normal ranges for vitals
+NORMAL_RANGES = {
+    "skin_temperature": (36.1, 37.2),
+    "heart_rate": (60, 100),
+    "blood_pressure_systolic": (90, 120),
+    "blood_pressure_diastolic": (60, 80),
+    "SpO2": (95, 100),
+    "mobility": (1000, 20000),
+}
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Allow React local dev server
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Input model for vitals
-class VitalsInput(BaseModel):
-    skin_temperature: float
-    heart_rate: float
-    blood_pressure_systolic: float
-    blood_pressure_diastolic: float
-    SpO2: float
-    mobility: int
-    ecg_anomaly: bool
-
-# Input model for question chat
-class QuestionInput(BaseModel):
-    question: str
-
-# Initialize retriever and LLM once
+# Load retriever and LLM
 retriever = PineconeVectorStore.from_existing_index(
     index_name="mhmb",
     embedding=get_embeddings()
@@ -53,33 +38,97 @@ qa_chain = RetrievalQA.from_chain_type(
     retriever=retriever,
     return_source_documents=True
 )
-# Root health check
-@app.get("/")
-def root():
-    return {"status": "running"}
 
-# Endpoint for vitals-based anomaly detection and alerting
-@app.post("/analyze")
-async def analyze_vitals(vitals: VitalsInput, response: Response):
-    data = vitals.dict()
-    anomalies = check_anomalies(data)
+class VitalsData(BaseModel):
+    skin_temperature: float
+    heart_rate: int
+    blood_pressure_systolic: int
+    blood_pressure_diastolic: int
+    SpO2: int
+    mobility: int
+    ecg_anomaly: bool
+
+class ChatRequest(BaseModel):
+    question: str
+
+def check_anomalies(data):
+    anomalies = {}
+    for key, value in data.items():
+        if key == "ecg_anomaly" and value is True:
+            anomalies[key] = "Abnormal ECG"
+        elif key in NORMAL_RANGES:
+            low, high = NORMAL_RANGES[key]
+            if value < low or value > high:
+                anomalies[key] = value
+    return anomalies
+
+def simplify_explanation(text: str) -> str:
+    lines = text.split('\n')
+    simplified_lines = []
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+        if line.startswith("*") or line[0].isdigit() or len(simplified_lines) < 4:
+            line = line.replace('"', '').replace('SpO2', 'oxygen level').replace('tachycardic', 'fast heart rate')
+            simplified_lines.append(line)
+        if len(simplified_lines) >= 4:
+            break
+    simplified_lines.append("Please consult your doctor for proper care.")
+    return " ".join(simplified_lines)
+
+@app.post("/trigger-alert")
+async def trigger_alert(vitals: VitalsData):
+    patient_data = vitals.dict()
+
+    # Check if all vitals are zero or false (excluding ecg_anomaly bool)
+    all_zero = all(
+        (value == 0 or value is False)
+        for key, value in patient_data.items()
+        if key != "ecg_anomaly"
+    )
+    if all_zero:
+        return {
+            "alert_summary": "Invalid or missing sensor data detected.",
+            "medical_explanation": (
+                "All vital readings are zero, which likely indicates sensor error or missing data. "
+                "Please check the health monitoring device for proper operation."
+            )
+        }
+
+    anomalies = check_anomalies(patient_data)
 
     if not anomalies:
-        response.status_code = status.HTTP_204_NO_CONTENT
-        return
+        return {"message": "All vitals are within normal range."}
 
-    alert_message = generate_combined_alert(anomalies, qa_chain)
+    description = [
+        "abnormal ECG" if k == "ecg_anomaly" else f"{k.replace('_', ' ')} = {v}"
+        for k, v in anomalies.items()
+    ]
+    alert_summary = "; ".join(description)
+
+    query = (
+        f"The patient shows the following anomalies: {alert_summary}. "
+        f"What does this suggest and what actions should be taken?"
+    )
+    response = qa_chain({"query": query})
+    explanation = response["result"]
+
+    simplified = simplify_explanation(explanation)
+
     return {
-        "status": "alert",
-        "message": alert_message
+        "alert_summary": alert_summary,
+        "medical_explanation": simplified
     }
 
-# Endpoint for general medical question-answering
 @app.post("/ask")
-async def ask_medical_question(input: QuestionInput):
-    response = qa_chain.invoke({"query": input.question})
-    answer = response["result"]
-    return {
-        "question": input.question,
-        "answer": answer
-    }
+async def ask_question(req: ChatRequest):
+    question = req.question.strip()
+    if not question:
+        raise HTTPException(status_code=400, detail="Question cannot be empty.")
+    response = qa_chain({"query": question})
+    return {"answer": response["result"]}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
