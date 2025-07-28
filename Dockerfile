@@ -1,21 +1,29 @@
-# Use slim Python base image
+# Use a slim Python base image
 FROM python:3.10-slim
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 # Set working directory
 WORKDIR /app
 
-# Copy all your project files into the container
-COPY . /app
+# Install system dependencies for pip packages (if needed)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install system dependencies if needed (e.g., gcc for some packages)
-RUN apt-get update && apt-get install -y build-essential && \
-    pip install --upgrade pip && \
-    pip install -r requirements.txt && \
-   apt-get purge -y --auto-remove build-essential && \
-    rm -rf /var/lib/apt/lists/*
-    
-# Expose the port your FastAPI app will run on
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copy project files
+COPY . .
+
+# Expose port for FastAPI
 EXPOSE 8000
 
-# Run the FastAPI server with a single worker to avoid OOM
+# Command to run the FastAPI app with a single worker (to prevent OOM)
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
