@@ -8,3 +8,10 @@ langchain-pinecone
 langchain-groq
 python-dotenv
 langchain-community
+
+requests
+pydantic
+langchain
+pinecone-client
+langchain-groq
+langchain-community
