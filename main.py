@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from typing import List, Dict, Any, Optional
 from langchain.chains import RetrievalQA
 from langchain_pinecone import PineconeVectorStore
 from langchain_groq import ChatGroq
@@ -83,6 +84,24 @@ class DailySuggestionRequest(BaseModel):
     SpO2: int
     mobility: int
     ecg_anomaly: bool
+
+class VitalsHistoryEntry(BaseModel):
+    username: str
+    skin_temperature: float
+    heart_rate: int
+    blood_pressure_systolic: int
+    blood_pressure_diastolic: int
+    SpO2: int
+    mobility: int
+    ecg_anomaly: bool
+
+class HistoryListRequest(BaseModel):
+    records: List[VitalsHistoryEntry]
+
+class TreatmentApproval(BaseModel):
+    username: str
+    treatment_message: str
+    doctor_notes: Optional[str] = None
 
 # Helpers
 def check_anomalies(data):
@@ -193,6 +212,49 @@ async def daily_suggestion(req: DailySuggestionRequest):
     )
     response = qa_chain({"query": prompt})
     return {"username": req.username, "daily_tip": simplify_explanation(response["result"]) }
+
+@app.post("/summarize-history")
+async def summarize_history(req: HistoryListRequest):
+    if not req.records:
+        raise HTTPException(status_code=400, detail="No records provided.")
+    username = req.records[0].username
+    records = [r.dict(exclude={"username"}) for r in req.records]
+    prompt = f"""
+Patient: {username}
+Last 7 days vitals:\n{records}
+Summarize trends, identify clinical risks, and mention if follow-up is needed.
+Limit to 3 sentences.
+"""
+    result = qa_chain({"query": prompt})
+    return {"summary": simplify_explanation(result["result"])}
+
+@app.post("/suggest-treatment")
+async def suggest_treatment(req: HistoryListRequest):
+    if not req.records:
+        raise HTTPException(status_code=400, detail="No records provided.")
+    username = req.records[0].username
+    records = [r.dict(exclude={"username"}) for r in req.records]
+    prompt = f"""
+You are a medical assistant AI helping a doctor.
+
+Analyze the following 7-day vitals data for patient {username}:
+{records}
+
+Generate a detailed clinical assessment including observed trends (e.g. hypertension, tachycardia, fever, low SpO2, etc.). Then, suggest an appropriate treatment plan that includes both lifestyle recommendations and suitable medications (by drug class, not brand names). Only provide the plan for the doctor to review and approve.
+"""
+    result = qa_chain({"query": prompt})
+    return {"treatment_plan": result["result"]}
+
+@app.post("/approve-treatment")
+async def approve_treatment(payload: TreatmentApproval):
+    final_message = payload.treatment_message
+    if payload.doctor_notes:
+        final_message += f"\n\n🩺 Doctor's Notes: {payload.doctor_notes}"
+    return {
+        "status": "sent",
+        "username": payload.username,
+        "final_message": final_message
+    }
 
 if __name__ == "__main__":
     import uvicorn
