@@ -1,20 +1,13 @@
-fastapi==0.111.0
-uvicorn[standard]==0.30.1
-python-dotenv==1.0.1
-requests==2.32.3
-pydantic==1.10.14
-
-# LangChain & related dependencies
-langchain==0.2.3
-langchain-community==0.2.3
-langchain-groq==0.1.4
-langchain-pinecone==0.1.0
-
-# Pinecone client
-pinecone-client==4.1.0
-
-# For preprocessing (if used in preprocess_books.py)
-tqdm==4.66.4
-
-# Optional: for better performance with HTTP and retry logic
-httpx==0.27.0
+fastapi
+uvicorn
+python-dotenv
+requests
+pydantic
+langchain
+langchain-groq
+langchain-pinecone
+langchain-community
+pinecone-client
+sentence-transformers
+torch
+transformers
